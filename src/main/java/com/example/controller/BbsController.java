@@ -2,6 +2,7 @@ package com.example.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -32,12 +33,16 @@ public class BbsController {
 	@RequestMapping("/show")
 	public String showBbs() {
 		@SuppressWarnings("unchecked")
+		
+		String token = UUID.randomUUID().toString();
+		session.setAttribute("token", token);
+		
 		List<Article> articleList = (List<Article>) session.getAttribute("articleList");
-		if(articleList == null) {
+		if (articleList == null) {
 			articleList = new ArrayList<Article>();
 		}
-		session.setAttribute("articleList", articleList);	
-		
+		session.setAttribute("articleList", articleList);
+
 		// 投稿画面へ遷移
 		return "bbs";
 	}
@@ -45,27 +50,34 @@ public class BbsController {
 	/**
 	 * 記事を投稿します.
 	 * 
-	 * @param name
-	 *            リクエストパラメータのname
-	 * @param body
-	 *            リクエストパラメータのbody
+	 * @param name リクエストパラメータのname
+	 * @param body リクエストパラメータのbody
 	 * @return 掲示板画面
 	 */
 	@RequestMapping("/postArticle")
-	public String postArticle(String name, String body) {
+	public String postArticle(String name, String body, String token) {
 		@SuppressWarnings("unchecked")
+
+		
+		String tokenInSession = (String) session.getAttribute("token");
+		if (token == null || !(token.equals(tokenInSession))) {
+			return "error";
+		}
+
 		List<Article> articleList = (List<Article>) session.getAttribute("articleList");
 		Article article = new Article(name, body);
 		ArticleService articleService = new ArticleService();
 		articleService.postArticle(articleList, article);
+		
+		session.removeAttribute("token");
+		
 		return "redirect:/bbs/show";
 	}
 
 	/**
 	 * 記事を削除します.
 	 * 
-	 * @param index
-	 *            リクエストパラメータのindex
+	 * @param index リクエストパラメータのindex
 	 * @return 掲示板画面
 	 */
 	@RequestMapping("/deleteArticle")
@@ -73,7 +85,7 @@ public class BbsController {
 		@SuppressWarnings("unchecked")
 		List<Article> articleList = (List<Article>) session.getAttribute("articleList");
 		ArticleService articleService = new ArticleService();
-		int intIndex = Integer.parseInt(index); //indexをStringからintに変換
+		int intIndex = Integer.parseInt(index); // indexをStringからintに変換
 		articleService.deleteArticle(articleList, intIndex);
 		return "redirect:/bbs/show";
 	}

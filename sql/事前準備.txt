@@ -1,7 +1,5 @@
---テーブルがあった場合は事前に削除
 DROP TABLE members;
 
--- メンバー情報テーブル
 create table members(
  id serial primary key,
  name text not null,

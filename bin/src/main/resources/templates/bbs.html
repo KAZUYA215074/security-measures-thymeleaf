@@ -20,15 +20,13 @@
 	<input type="text" name="name"><br>
 	内容<br>
 	<textarea rows="5" cols="20" name="body"></textarea><br>
-	<input type="hidden" name="token" th:value="${session.token}">
 	<button>投稿</button><br>
-	
 </form>
 <div th:each="article, status:${session.articleList}">
 	<hr>
-	番号:<span th:text="${status.index}"></span><br>
-	名前:<span th:text="${article.name}"></span><br>
-	内容:<span th:text="${article.body}"></span><br>
+	番号:<span th:utext="${status.index}"></span><br>
+	名前:<span th:utext="${article.name}"></span><br>
+	内容:<span th:utext="${article.body}"></span><br>
 	<form th:action="@{/bbs/deleteArticle}" method="post">
 	    <input type="hidden" name="index" th:value="${status.index}">
 	    <button>削除</button>
